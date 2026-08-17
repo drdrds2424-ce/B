@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عيادة الدكتور علي محمد الجشعمي</title>
+    
+    <!-- خط Cairo ورابط FontAwesome للأيقونات -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --secondary: #0f172a;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #1eb854;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            background: var(--bg); 
+            padding: 30px 15px; 
+            color: var(--text-main); 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.07); 
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        /* Dr. Header Styling */
+        .doctor-header { 
+            text-align: center; 
+            margin-bottom: 25px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px dashed var(--border); 
+        }
+
+        .doctor-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+        }
+
+        .doctor-title { 
+            font-size: 24px; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin-bottom: 4px; 
+        }
+
+        .doctor-sub { 
+            font-size: 14px; 
+            color: var(--primary); 
+            font-weight: 700; 
+        }
+
+        /* Quick Info Cards for Patient */
+        .clinic-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .info-card i {
+            color: var(--primary);
+            margin-left: 5px;
+        }
+
+        /* Day Badge */
+        .day-badge { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: #ffffff; 
+            text-align: center; 
+            font-weight: 700; 
+            font-size: 15px; 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+        }
+        
+        /* Table Styling */
+        .schedule-table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            margin-bottom: 25px; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+        }
+
+        .schedule-table th, .schedule-table td { 
+            padding: 12px 10px; 
+            text-align: center; 
+            font-size: 14px; 
+        }
+
+        .schedule-table th { 
+            background-color: var(--secondary); 
+            color: #ffffff; 
+            font-weight: 700; 
+        }
+
+        .schedule-table td { 
+            border-bottom: 1px solid #f1f5f9; 
+            background-color: #fff;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-badge { 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            font-size: 12px; 
+        }
+
+        .available { background-color: #dcfce7; color: #15803d; }
+        .booked { background-color: #fee2e2; color: #b91c1c; }
+
+        /* Form Styling */
+        .form-title { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin-bottom: 15px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 700; 
+            color: #334155; 
+            font-size: 13px; 
+        }
+
+        label i {
+            color: var(--primary);
+            margin-left: 4px;
+        }
+
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1.5px solid var(--border); 
+            border-radius: 10px; 
+            font-size: 14px; 
+            outline: none; 
+            transition: all 0.2s ease; 
+            background: #f8fafc; 
+            color: var(--text-main);
+        }
+
+        input:focus, textarea:focus, select:focus { 
+            border-color: var(--primary); 
+            background: #ffffff; 
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+        
+        /* WhatsApp Button */
+        .btn-whatsapp { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--whatsapp); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+        }
+
+        .btn-whatsapp:hover { 
+            background: var(--whatsapp-hover); 
+            transform: translateY(-1px);
+        }
+
+        .btn-whatsapp i {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="doctor-header">
+        <div class="doctor-avatar">
+            <i class="fa-solid => fa-user-doctor"></i>
+        </div>
+        <h1 class="doctor-title">عيادة الدكتور علي محمد الجشعمي</h1>
+        <p class="doctor-sub">نظام حجز المواعيد الإلكتروني المباشر</p>
+    </div>
+
+    <!-- Quick Info Cards -->
+    <div class="clinic-info-grid">
+        <div class="info-card">
+            <i class="fa-regular fa-clock"></i> <strong>أوقات العمل:</strong><br>4:00 م - 8:00 م
+        </div>
+        <div class="info-card">
+            <i class="fa-solid fa-location-dot"></i> <strong>الموقع:</strong><br>الشارع العام - العيادات
+        </div>
+    </div>
+
+    <div class="day-badge" id="dayTitle"><i class="fa-regular fa-calendar-check"></i> جدول مواعيد اليوم</div>
+    
+    <!-- Schedule Table -->
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>رقم الحجز</th>
+                <th>الوقت التقديري</th>
+                <th>الحالة</th>
+            </tr>
+        </thead>
+        <tbody id="patientScheduleBody">
+            <!-- سيتم توليد المواعيد برمجياً أو عبر Firebase -->
+            <tr>
+                <td><strong>#1</strong></td>
+                <td>04:00 مساءً</td>
+                <td><span class="status-badge available">متاح</span></td>
+            </tr>
+            <tr>
+                <td><strong>#2</strong></td>
+                <td>04:30 مساءً</td>
+                <td><span class="status-badge booked">محجوز</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Booking Form -->
+    <div class="form-title">
+        <i class="fa-solid fa-file-pen"></i> استمارة تثبيت الحجز
+    </div>
+
+    <form id="bookingForm">
+        <div class="form-group">
+            <label><i class="fa-solid fa-list-ol"></i> اختر رقم الحجز المتاح:</label>
+            <select id="slotSelect" required>
+                <option value="">-- اختر من المواعيد المتاحة --</option>
+                <option value="1">حجز رقم #1 (04:00 مساءً)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> اسم المريض الثلاثي:</label>
+            <input type="text" id="name" placeholder="أدخل الاسم الكامل" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-phone"></i> رقم الهاتف للتواصل:</label>
+            <input type="tel" id="phone" placeholder="07XXXXXXXXX" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-map-pin"></i> السكن / العنوان:</label>
+            <input type="text" id="address" placeholder="المحافظة - المنطقة" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-notes-medical"></i> سبب الزيارة / الأعراض (اختياري):</label>
+            <textarea id="notes" rows="3" placeholder="اكتب نبذة مختصرة عن الحالة الصحية..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> تأكيد الحجز وإرسال عبر الواتساب
+        </button>
+    </form>
+</div>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+    // إعدادات Firebase الخاصة بك
+    const firebaseConfig = {
+        apiKey: "AIzaSyA083dRD4EYwVj-Y--AsqOzpz7ewhZlmYo",
+        authDomain: "clinic-system-98d2e.firebaseapp.com",
+        databaseURL: "https://clinic-system-98d2e-default-rtdb.firebaseio.com",
+        projectId: "clinic-system-98d2e",
+        storageBucket: "clinic-system-98d2e.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "1:123456789:web:abcdef123456"
+    };
+
+    // تهيئة Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // رقم هاتف العيادة للواتساب (قم بتغييره للرقم المطلوب بصيغة دولية بدون +)
+    const CLINIC_WHATSAPP_NUMBER = "9647700000000"; 
+
+    // معالجة إرسال النموذج
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const slot = document.getElementById('slotSelect').value;
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+        const notes = document.getElementById('notes').value || "لا يوجد";
+
+        // صياغة رسالة الواتساب المنسقة
+        const message = `*طلب حجز موعد جديد*%0A` +
+                        `----------------------------%0A` +
+                        `👤 *اسم المريض:* ${name}%0A` +
+                        `🔢 *رقم الحجز:* ${slot}%0A` +
+                        `📞 *رقم الهاتف:* ${phone}%0A` +
+                        `📍 *العنوان:* ${address}%0A` +
+                        `📝 *ملاحظات/أعراض:* ${notes}%0A` +
+                        `----------------------------%0A` +
+                        `يرجى تأكيد الحجز، شكراً لكم.`;
+
+        // فتح رابط الواتساب مباشرة
+        const whatsappUrl = `https://wa.me/${CLINIC_WHATSAPP_NUMBER}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+    });
+</script>
+
+</body>
+</html>
