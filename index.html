@@ -98,6 +98,250 @@
     <div class="clinic-info-grid">
         <div class="info-card">
             <i class="fa-regular fa-clock"></i> <strong>أوقات العمل:</strong><br>
+            <span id="workHoursText">غير محدد</span>
+        </div>
+        <div class="info-card">
+            <i class="fa-solid fa-location-dot"></i> <strong>الموقع:</strong><br>
+            <span id="locationText">غير محدد</span>
+        </div>
+    </div>
+
+    <div class="day-badge">
+        <i class="fa-regular fa-calendar-check"></i> <span id="currentDayText">جدول مواعيد اليوم</span>
+    </div>
+    
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>رقم الحجز</th>
+                <th>الوقت التقديري</th>
+                <th>الحالة</th>
+            </tr>
+        </thead>
+        <tbody id="patientScheduleBody">
+            <tr><td colspan="3">جارٍ تحميل المواعيد...</td></tr>
+        </tbody>
+    </table>
+
+    <div class="form-title">
+        <i class="fa-solid fa-file-pen"></i> استمارة تثبيت الحجز
+    </div>
+
+    <form id="bookingForm">
+        <div class="form-group">
+            <label><i class="fa-solid fa-list-ol"></i> اختر رقم الحجز المتاح:</label>
+            <select id="slotSelect" required>
+                <option value="">-- اختر من المواعيد المتاحة --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> اسم المريض الثلاثي:</label>
+            <input type="text" id="name" placeholder="أدخل الاسم الكامل" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-phone"></i> رقم الهاتف للتواصل:</label>
+            <input type="tel" id="phone" placeholder="07XXXXXXXXX" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-map-pin"></i> السكن / العنوان:</label>
+            <input type="text" id="address" placeholder="المحافظة - المنطقة" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fa-solid fa-notes-medical"></i> سبب الزيارة / الأعراض (اختياري):</label>
+            <textarea id="notes" rows="3" placeholder="اكتب نبذة مختصرة عن الحالة الصحية..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> تأكيد الحجز وإرسال عبر الواتساب
+        </button>
+    </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyA083dRD4EYwVj-Y--AsqOzpz7ewhZlmYo",
+        authDomain: "clinic-system-98d2e.firebaseapp.com",
+        databaseURL: "https://clinic-system-98d2e-default-rtdb.firebaseio.com",
+        projectId: "clinic-system-98d2e",
+        storageBucket: "clinic-system-98d2e.firebasestorage.app",
+        messagingSenderId: "1025874349100",
+        appId: "1:1025874349100:web:6fe72cebe668705a4c1589"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    let clinicWhatsapp = "9647700000000"; 
+
+    // قراءة البيانات من نفس المسار الموحد
+    db.ref('clinicInfo').on('value', snapshot => {
+        const info = snapshot.val();
+        if(info) {
+            if(info.currentDay) document.getElementById('currentDayText').innerText = info.currentDay;
+            if(info.workHours) document.getElementById('workHoursText').innerText = info.workHours;
+            if(info.location) document.getElementById('locationText').innerText = info.location;
+            if(info.phone) clinicWhatsapp = info.phone;
+        }
+    });
+
+    db.ref('slots').on('value', snapshot => {
+        const tableBody = document.getElementById('patientScheduleBody');
+        const slotSelect = document.getElementById('slotSelect');
+        
+        tableBody.innerHTML = '';
+        slotSelect.innerHTML = '<option value="">-- اختر من المواعيد المتاحة --</option>';
+
+        const slots = snapshot.val();
+
+        if(slots) {
+            for(let id in slots) {
+                const slot = slots[id];
+                tableBody.innerHTML += `
+                    <tr>
+                        <td><strong>#${slot.id}</strong></td>
+                        <td>${slot.time}</td>
+                        <td>
+                            <span class="status-badge ${slot.isBooked ? 'booked' : 'available'}">
+                                ${slot.isBooked ? 'محجوز' : 'متاح'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+
+                if(!slot.isBooked) {
+                    slotSelect.innerHTML += `
+                        <option value="${slot.id}" data-time="${slot.time}">حجز رقم #${slot.id} (${slot.time})</option>
+                    `;
+                }
+            }
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="3">لا توجد مواعيد متاحة اليوم</td></tr>`;
+        }
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const selectElem = document.getElementById('slotSelect');
+        const slotId = selectElem.value;
+        const selectedOption = selectElem.options[selectElem.selectedIndex];
+        const slotTime = selectedOption.getAttribute('data-time') || '';
+
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+        const notes = document.getElementById('notes').value || "لا يوجد";
+
+        db.ref('slots/' + slotId + '/isBooked').set(true);
+        db.ref('bookings/' + slotId).set({
+            slotId: slotId,
+            slotTime: slotTime,
+            patientName: name,
+            phone: phone,
+            address: address,
+            notes: notes
+        });
+
+        const message = `*طلب حجز موعد جديد*%0A` +
+                        `----------------------------%0A` +
+                        `👤 *اسم المريض:* ${name}%0A` +
+                        `🔢 *رقم الحجز:* #${slotId} (${slotTime})%0A` +
+                        `📞 *رقم الهاتف:* ${phone}%0A` +
+                        `📍 *العنوان:* ${address}%0A` +
+                        `📝 *ملاحظات/أعراض:* ${notes}%0A` +
+                        `----------------------------%0A` +
+                        `يرجى تأكيد الحجز، شكراً لكم.`;
+
+        const whatsappUrl = `https://wa.me/${clinicWhatsapp}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+        
+        document.getElementById('bookingForm').reset();
+    });
+</script>
+
+</body>
+</html>
+.container { 
+            max-width: 600px; margin: 0 auto; background: var(--card-bg); 
+            padding: 30px; border-radius: 20px; 
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.07); 
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .doctor-header { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px dashed var(--border); }
+        .doctor-avatar {
+            width: 80px; height: 80px; background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: var(--primary); border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 36px; margin: 0 auto 15px auto;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+        }
+        .doctor-title { font-size: 24px; font-weight: 800; color: var(--secondary); margin-bottom: 4px; }
+        .doctor-sub { font-size: 14px; color: var(--primary); font-weight: 700; }
+
+        .clinic-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
+        .info-card { background: #f1f5f9; padding: 12px; border-radius: 12px; text-align: center; font-size: 13px; color: var(--text-main); }
+        .info-card i { color: var(--primary); margin-left: 5px; }
+
+        .day-badge { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: #ffffff; text-align: center; font-weight: 700; font-size: 15px; 
+            padding: 10px 15px; border-radius: 12px; margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+        }
+        
+        .schedule-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 25px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .schedule-table th, .schedule-table td { padding: 12px 10px; text-align: center; font-size: 14px; }
+        .schedule-table th { background-color: var(--secondary); color: #ffffff; font-weight: 700; }
+        .schedule-table td { border-bottom: 1px solid #f1f5f9; background-color: #fff; }
+
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px; }
+        .available { background-color: #dcfce7; color: #15803d; }
+        .booked { background-color: #fee2e2; color: #b91c1c; }
+
+        .form-title { font-size: 18px; font-weight: 800; color: var(--secondary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 700; color: #334155; font-size: 13px; }
+        label i { color: var(--primary); margin-left: 4px; }
+
+        input, textarea, select { 
+            width: 100%; padding: 12px 15px; border: 1.5px solid var(--border); 
+            border-radius: 10px; font-size: 14px; outline: none; transition: all 0.2s ease; 
+            background: #f8fafc; color: var(--text-main);
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); background: #ffffff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        
+        .btn-whatsapp { 
+            width: 100%; padding: 15px; background: var(--whatsapp); color: white; border: none; 
+            border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+        }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="doctor-header">
+        <div class="doctor-avatar">
+            <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <h1 class="doctor-title">عيادة الدكتور علي محمد الجشعمي</h1>
+        <p class="doctor-sub">نظام حجز المواعيد الإلكتروني المباشر</p>
+    </div>
+
+    <div class="clinic-info-grid">
+        <div class="info-card">
+            <i class="fa-regular fa-clock"></i> <strong>أوقات العمل:</strong><br>
             <span id="workHoursText">جارٍ التحميل...</span>
         </div>
         <div class="info-card">
